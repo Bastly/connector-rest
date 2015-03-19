@@ -18,13 +18,22 @@ var router = express.Router();              // get an instance of the express Ro
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/requestChaski', function(req, res) {
-    bastly.getWorker('channelId', function(reply){
+    console.log('requesting chaski');
+    var channel = req.param('channel');
+    if(!channel){
+        res.json({ message: "must specify ?channel="  });   
+        return;
+    }
+    console.log(channel);
+    bastly.getWorker(channel, function(reply){
         console.log('got reply: ' + reply);
         res.json({ message: reply  });   
     });
 });
 
 router.post('/publishMessage', function(req, res) {
+    //console.log(req);
+    //console.log(req.body);
     
     bastly.sendMessage(req.body.channel, req.body.message, function(repply){
         console.log('messasge ack!'); 
