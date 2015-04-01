@@ -3,6 +3,8 @@ var app        = express();
 var bodyParser = require('body-parser');
 var constants = require('bastly_constants');
 
+
+//allows CORS for everywhere
 var allowCrossDomain = function(req, res, next) {    
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -27,7 +29,7 @@ console.log('Listenint to port: ', port);
 // =============================================================================
 var router = express.Router();              // get an instance of the express Router
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
+// chaski worker request
 router.get('/requestChaski', function(req, res) {
     var channel = req.param('channel');
     var chaskiType = req.param('chaskiType');
@@ -39,16 +41,15 @@ router.get('/requestChaski', function(req, res) {
         res.json({ message: "must specify ?chaskiType="+constants.CHASKI_TYPE_SOCKETIO + '/' + constants.CHASKI_TYPE_ZEROMQ });   
         return;
     }
-    console.log(channel);
     bastly.getWorker(channel, chaskiType, function(reply){
         console.log('got reply from get worker: ' + reply);
         res.json({ message: reply  });   
     });
 });
 
+
+// message publisher 
 router.post('/publishMessage', function(req, res) {
-    //console.log(req);
-    //console.log(req.body);
     var data = JSON.parse(req.body.data);    
     bastly.sendMessage(req.body.channel, data, function(repply){
         console.log('messasge ack!'); 
