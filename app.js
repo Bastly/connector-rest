@@ -51,7 +51,10 @@ router.get('/requestChaski', function(req, res) {
 // message publisher 
 router.post('/publishMessage', function(req, res) {
     var data = JSON.parse(req.body.data);    
-    bastly.sendMessage(req.body.channel, data, function(repply){
+    var from = req.body.from;
+    var to = req.body.to;
+    var apiKey = req.body.apiKey;
+    bastly.sendMessage(to, from, apiKey, data, function(repply){
         console.log('messasge ack!'); 
         res.json({ message: 'ok' });   
     });
