@@ -4,7 +4,19 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var _ = require('underscore');
 var constants = require('bastly_constants');
+var program = require('commander');
 
+program
+  .version('0.0.1')
+  .usage('connector-rest --atahualpa <IP> --orion <IP:port>')
+  .option('-a, --atahualpa <IP>', 'specify atahualpa IP to connect to', '127.0.0.1')
+  .option('-o, --orion <IP:port>', 'specify orion IP and PORT to connect to', '127.0.0.1:1026')
+  .option('-c, --callback <IP:port>', 'specify the callback ip of this endpoint', '127.0.0.1:8080')
+  .parse(process.argv);
+
+console.log('Running with atahualpa on: ', program.atahualpa);
+console.log('Running with orion on: ', program.orion);
+console.log('Running with callback ip on: ', program.callback);
 
 //allows CORS for everywhere
 var allowCrossDomain = function(req, res, next) {    
@@ -14,9 +26,12 @@ var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, Origin, Accept');        
     next();
 };
+
 app.use(allowCrossDomain);
 
-var IP_ATAHUALPA = '127.0.0.1';
+var IP_ORION = program.orion;
+var IP_ATAHUALPA = program.atahualpa;
+var CALLBACK = program.callback;
 //var bastly = require('bastly')({ipAtahualpa:IP_ATAHUALPA});
 var bastly = require('../sdk-node')({ipAtahualpa:IP_ATAHUALPA});
 
@@ -42,7 +57,7 @@ router.get('/requestChaski', function(req, res) {
         return;
     }
     if(!chaskiType){
-        res.json({ message: "must specify ?chaskiType="+constants.CHASKI_TYPE_SOCKETIO + '/' + constants.CHASKI_TYPE_ZEROMQ });   
+        res.json({ message: "must specify ?chaskiType=" + constants.CHASKI_TYPE_SOCKETIO + '/' + constants.CHASKI_TYPE_ZEROMQ });   
         return;
     }
     bastly.getWorker(channel, chaskiType, function(reply){
@@ -66,7 +81,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
             console.log('create subscription');
             request.post({
-                url:'http://192.168.1.231:1026/v1/subscribeContext',
+                url:'http://' + IP_ORION + '/v1/subscribeContext',
                 json: true, 
                 body: {
                     "entities": [
@@ -128,7 +143,9 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
 router.post('/subscription', function (req, res) {
     console.log('subscription update of an object');
+    var updatedElement = req.body.contextResponses[0].contextElement;
     console.log(req.body.contextResponses[0].contextElement);
+    // if (updatedElement)
     res.sendStatus(200);
 });
 
@@ -148,5 +165,3 @@ app.use('/api', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-
-// subs 5512e663986d610148d74051
