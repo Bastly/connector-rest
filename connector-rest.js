@@ -143,7 +143,11 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
 router.post('/subscription', function (req, res) {
     var updatedElement = req.body.contextResponses[0].contextElement;
-    var channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
+    var channels = [];
+    if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
+        channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
+    }
+    
 
     console.log('Object data updated: ', updatedElement);
    
@@ -159,7 +163,7 @@ router.post('/subscription', function (req, res) {
 // message publisher 
 router.post('/publishMessage', function(req, res) {
     var data = JSON.parse(req.body.data);    
-    bastly.sendMessage(req.body.channel, data, function(repply){
+    bastly.sendMessage(req.body.channel, data, function(reply){
         console.log('messasge ack!'); 
         res.json({ message: 'ok' });
     });
@@ -172,3 +176,33 @@ app.use('/api', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
+
+
+// Register to all changes in structures in ORION each 30 secs
+request.post({
+    url: 'http://' + IP_ORION + '/v1/subscribeContext',
+    json: true, 
+    body: {
+        "entities": [
+            {
+                "type": "BastlyMSG",
+                "isPattern": "true",
+                "id": "BastlyKey:*"
+            }
+        ],
+        "attributes": [],
+        "reference": "http://" + IP_CALLBACK + "/api/subscribtionObjectStructure",
+        "duration": "P1M",
+        "notifyConditions": [
+            {
+                "type": "ONTIMEINTERVAL",
+                "condValues": [
+                    "PT30S"
+                ]
+            }
+        ]
+    }
+},
+function (error, response, body) {
+    console.log(body);
+});
