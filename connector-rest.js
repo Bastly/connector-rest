@@ -149,10 +149,12 @@ router.post('/subscription', function (req, res) {
     }
     
 
+    var apiKey = updatedElement.id.substring("BastlyKey:".length, updatedElement.id.indexOf(":userId:"));
     console.log('Object data updated: ', updatedElement);
    
     _.each(channels, function (channel) {
-         bastly.sendMessage(req.body.channel, updatedElement, function(reply){
+        //TODO verify apikey, from is ORION?
+        bastly.sendMessage(channel, "ORION", apiKey,  updatedElement, function(reply){
             console.log('messasge ack!', reply); 
         });
     });
@@ -163,9 +165,12 @@ router.post('/subscription', function (req, res) {
 // message publisher 
 router.post('/publishMessage', function(req, res) {
     var data = JSON.parse(req.body.data);    
-    bastly.sendMessage(req.body.channel, data, function(reply){
+    var from = req.body.from;
+    var to = req.body.to;
+    var apiKey = req.body.apiKey;
+    bastly.sendMessage(to, from, apiKey, data, function(repply){
         console.log('messasge ack!'); 
-        res.json({ message: 'ok' });
+        res.json({ message: 'ok' });   
     });
 });
 
