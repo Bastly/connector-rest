@@ -8,7 +8,7 @@ var program = require('commander');
 
 program
   .version('0.0.1')
-  .usage('connector-rest --atahualpa <IP> --orion <IP:port>')
+  .usage('connector-rest --atahualpa <IP> --orion <IP:port> --callback <IP:port>')
   .option('-a, --atahualpa <IP>', 'specify atahualpa IP to connect to', '127.0.0.1')
   .option('-o, --orion <IP:port>', 'specify orion IP and PORT to connect to', '127.0.0.1:1026')
   .option('-c, --callback <IP:port>', 'specify the callback ip of this endpoint', '127.0.0.1:8080')
@@ -19,7 +19,7 @@ console.log('Running with orion on: ', program.orion);
 console.log('Running with callback ip on: ', program.callback);
 
 //allows CORS for everywhere
-var allowCrossDomain = function(req, res, next) {    
+var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -31,7 +31,7 @@ app.use(allowCrossDomain);
 
 var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
-var CALLBACK = program.callback;
+var IP_CALLBACK = program.callback;
 //var bastly = require('bastly')({ipAtahualpa:IP_ATAHUALPA});
 var bastly = require('../sdk-node')({ipAtahualpa:IP_ATAHUALPA});
 
@@ -81,7 +81,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
             console.log('create subscription');
             request.post({
-                url:'http://' + IP_ORION + '/v1/subscribeContext',
+                url: 'http://' + IP_ORION + '/v1/subscribeContext',
                 json: true, 
                 body: {
                     "entities": [
@@ -92,7 +92,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
                     }
                     ],
                     "attributes": [],
-                    "reference": "http://192.168.1.186:8080/api/subscription",
+                    "reference": "http://" + IP_CALLBACK + "/api/subscription",
                     "duration": "P1M",
                     "notifyConditions": [
                     {
@@ -114,7 +114,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
                 console.log('update subscription ', subscriptions[elem.contextElement.id].subscriptionId);
 
                 request.post({
-                    url:'http://192.168.1.231:1026/v1/updateContextSubscription',
+                    url: 'http://' + IP_ORION + '/v1/updateContextSubscription',
                     json: true, 
                     body: {
                         "subscriptionId": subscriptions[elem.contextElement.id].subscriptionId,
@@ -142,10 +142,17 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 });
 
 router.post('/subscription', function (req, res) {
-    console.log('subscription update of an object');
     var updatedElement = req.body.contextResponses[0].contextElement;
-    console.log(req.body.contextResponses[0].contextElement);
-    // if (updatedElement)
+    var channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
+
+    console.log('Object data updated: ', updatedElement);
+   
+    _.each(channels, function (channel) {
+         bastly.sendMessage(req.body.channel, updatedElement, function(reply){
+            console.log('messasge ack!', reply); 
+        });
+    });
+
     res.sendStatus(200);
 });
 
@@ -154,7 +161,7 @@ router.post('/publishMessage', function(req, res) {
     var data = JSON.parse(req.body.data);    
     bastly.sendMessage(req.body.channel, data, function(repply){
         console.log('messasge ack!'); 
-        res.json({ message: 'ok' });   
+        res.json({ message: 'ok' });
     });
 });
 
