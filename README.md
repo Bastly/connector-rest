@@ -92,3 +92,16 @@ POST http://ORION_IP:1026/v1/updateContext
         }
     ]
     }
+
+# Data forwarded to Atahualpa
+
+    { 
+        type: 'BastlyMSG',
+        isPattern: 'false',
+        id: 'BastlyKey:1234:userId:1234',
+        attributes: 
+        [ 
+            { name: 'temperature', type: 'float', value: '23' },
+            { name: 'pressure', type: 'integer', value: '720' } 
+        ] 
+    }
