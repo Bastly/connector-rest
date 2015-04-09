@@ -52,6 +52,7 @@ var router = express.Router();              // get an instance of the express Ro
 router.get('/requestChaski', function(req, res) {
     var channel = req.param('channel');
     var chaskiType = req.param('chaskiType');
+    console.log('requesting chaski', channel, chaskiType); 
     if(!channel){
         res.json({ message: "must specify ?channel="  });   
         return;
@@ -104,7 +105,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
                 }
             },
             function (error, response, body) {
-                console.log(body);
+                console.log('body', body);
                 subscriptions[elem.contextElement.id] = {subscriptionId : body.subscribeResponse.subscriptionId, attributes : attrs};
             });
 
@@ -209,5 +210,5 @@ request.post({
     }
 },
 function (error, response, body) {
-    console.log(body);
+    console.log('body 2', body);
 });
