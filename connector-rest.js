@@ -32,8 +32,8 @@ app.use(allowCrossDomain);
 var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
-//var bastly = require('bastly')({ipAtahualpa:IP_ATAHUALPA});
-var bastly = require('../sdk-node')({ipAtahualpa:IP_ATAHUALPA});
+var bastly = require('bastly')({ipAtahualpa:IP_ATAHUALPA});
+// var bastly = require('../sdk-node')({ipAtahualpa:IP_ATAHUALPA});
 
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
