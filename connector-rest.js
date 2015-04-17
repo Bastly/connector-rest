@@ -210,7 +210,7 @@ request.post({
     }
 },
 function (error, response, body) {
-    if (err) console.log('err', error);
+    if (error) console.log('err', error);
     console.log('res: ', response);
     console.log('body: ', body);
 });
