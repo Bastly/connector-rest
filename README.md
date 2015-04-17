@@ -4,7 +4,10 @@
 To get the help
 
     node connector-rest -help
- 
+# Check Orion
+
+GET http://ORION_IP:1026/version
+
 # API calls and examples to ORION
 
 Create element
