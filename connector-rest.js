@@ -210,5 +210,7 @@ request.post({
     }
 },
 function (error, response, body) {
-    console.log('body 2', body);
+    if (err) console.log('err', error);
+    console.log('res: ', response);
+    console.log('body: ', body);
 });
