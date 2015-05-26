@@ -51,17 +51,15 @@ var router = express.Router();              // get an instance of the express Ro
 // chaski worker request
 router.get('/requestChaski', function(req, res) {
     var channel = req.param('channel');
-    var chaskiType = req.param('chaskiType');
-    console.log('requesting chaski', channel, chaskiType); 
+    var from = req.param('from');
+    var apiKey = req.param('apiKey');
+   
     if(!channel){
         res.json({ message: "must specify ?channel="  });   
         return;
     }
-    if(!chaskiType){
-        res.json({ message: "must specify ?chaskiType=" + constants.CHASKI_TYPE_SOCKETIO + '/' + constants.CHASKI_TYPE_ZEROMQ });   
-        return;
-    }
-    bastly.getWorker(channel, chaskiType, function(reply){
+
+    bastly.getWorker(channel, from, apiKey, function (reply) {
         console.log('got reply from get worker: ' + reply);
         res.json({ message: reply  });   
     });
@@ -187,7 +185,7 @@ app.listen(port);
 // Register to all changes in structures in ORION each 30 secs
 request.post({
     url: 'http://' + IP_ORION + '/v1/subscribeContext',
-    json: true, 
+    json: true,
     body: {
         "entities": [
             {
