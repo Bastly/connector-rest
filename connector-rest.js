@@ -54,8 +54,8 @@ router.get('/requestChaski', function(req, res) {
     var from = req.param('from');
     var apiKey = req.param('apiKey');
    
-    if(!channel){
-        res.json({ message: "must specify ?channel="  });   
+    if(!channel || !from || !apiKey){
+        res.json({ message: "must specify channel, from and apiKey"  });   
         return;
     }
 
