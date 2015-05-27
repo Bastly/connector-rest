@@ -32,8 +32,8 @@ app.use(allowCrossDomain);
 var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
-var bastly = require('bastly')({ipAtahualpa:IP_ATAHUALPA});
-// var bastly = require('../sdk-node')({ipAtahualpa:IP_ATAHUALPA});
+
+var bastly = require('bastly')({ connector: IP_ATAHUALPA, middleware: true });
 
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,7 +55,7 @@ router.get('/requestChaski', function(req, res) {
     var apiKey = req.param('apiKey');
    
     if(!channel || !from || !apiKey){
-        res.json({ message: "must specify channel, from and apiKey"  });   
+        res.json({ message: "must specify channel, from and apiKey"  });
         return;
     }
 
@@ -64,6 +64,7 @@ router.get('/requestChaski', function(req, res) {
         res.json({ message: reply  });   
     }, constants.CHASKI_TYPE_SOCKETIO );
 });
+
 
 router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d23677ebc3cff
     // console.log('object structure watcher');
