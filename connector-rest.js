@@ -62,7 +62,7 @@ router.get('/requestChaski', function(req, res) {
     bastly.getWorker(channel, from, apiKey, function (reply) {
         console.log('got reply from get worker: ' + reply);
         res.json({ message: reply  });   
-    });
+    }, constants.CHASKI_TYPE_SOCKETIO );
 });
 
 router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d23677ebc3cff
