@@ -33,7 +33,7 @@ var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
 
-var bastly = require('bastly')({ connector: IP_ATAHUALPA, middleware: true });
+var bastly = require('bastly')({ from: 'connector', apiKey: 'none', connector: IP_ATAHUALPA, middleware: true });
 
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
