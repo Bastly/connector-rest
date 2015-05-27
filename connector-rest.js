@@ -60,7 +60,7 @@ router.get('/requestChaski', function(req, res) {
     }
 
     bastly.getWorker(channel, from, apiKey, function (status, reply) {
-        console.log('got reply from get worker: ' + status + 'payload' + reply);
+        console.log('got reply from get worker: ' + status.toString() + 'payload ' + reply.toString());
         res.json({ status: status, message: reply  });   
     });
 });
