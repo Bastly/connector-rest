@@ -50,9 +50,9 @@ var router = express.Router();              // get an instance of the express Ro
 
 // chaski worker request
 router.get('/requestChaski', function(req, res) {
-    var channel = req.param('channel');
-    var from = req.param('from');
-    var apiKey = req.param('apiKey');
+    var channel = req.params.channel;
+    var from = req.params.from;
+    var apiKey = req.params.apiKey;
    
     if(!channel || !from || !apiKey){
         res.json({ message: "must specify channel, from and apiKey"  });
@@ -61,7 +61,7 @@ router.get('/requestChaski', function(req, res) {
 
     bastly.getWorker(channel, from, apiKey, function (status, reply) {
         console.log('got reply from get worker: ' + status + 'payload ' + reply);
-        res.send( status, reply );   
+        res.status(status).send(reply);   
     });
 });
 
@@ -154,7 +154,7 @@ router.post('/subscription', function (req, res) {
    
     _.each(channels, function (channel) {
         //TODO verify apikey, from is ORION?
-        bastly.sendMessage(channel, "ORION", apiKey,  updatedElement, function(reply){
+        bastly.sendMessage(channel, "ORION", apiKey,  updatedElement, function(err, reply){
             console.log('messasge ack!', reply); 
         });
     });
@@ -164,13 +164,18 @@ router.post('/subscription', function (req, res) {
 
 // message publisher 
 router.post('/publishMessage', function(req, res) {
-    var data = JSON.parse(req.body.data);    
+    var data = req.body.data;    
     var from = req.body.from;
     var to = req.body.to;
     var apiKey = req.body.apiKey;
-    bastly.sendMessage(to, from, apiKey, data, function(repply){
-        console.log('messasge ack!'); 
-        res.json({ message: 'ok' });   
+    bastly.sendMessage(to, from, apiKey, data, function(err, reply){
+        console.log('messasge ack!' + reply); 
+        if (err) {
+            res.status(404).body({ message: err });  
+        } else {
+            res.status(200).body({ message: reply }); 
+        }
+         
     });
 });
 
