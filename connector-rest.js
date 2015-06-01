@@ -173,6 +173,9 @@ router.post('/publishMessage', function(req, res) {
     var from = req.body.from;
     var to = req.body.to;
     var apiKey = req.body.apiKey;
+
+    console.log(data, data === 'object');
+
     bastly.sendMessage(to, from, apiKey, data, function(err, reply){
         console.log('messasge ack!' + reply); 
         if (err) {
