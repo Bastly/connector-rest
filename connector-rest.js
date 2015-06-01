@@ -60,9 +60,13 @@ router.get('/requestChaski', function(req, res) {
         return;
     }
 
-    bastly.getWorker(channel, from, apiKey, function (status, reply) {
+    bastly.getWorker(channel, from, apiKey, function (error, reply) {
         console.log('got reply from get worker: ' + status + 'payload ' + reply);
-        res.status(status).send(reply);   
+        if (error) {
+            res.status(404).send(reply);   
+        } else {
+            res.status(200).send(reply);   
+        }  
     });
 });
 
