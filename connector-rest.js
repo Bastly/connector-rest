@@ -61,7 +61,7 @@ router.get('/requestChaski', function(req, res) {
     }
 
     bastly.getWorker(channel, from, apiKey, function (error, reply) {
-        console.log('got reply from get worker: ' + status + 'payload ' + reply);
+        console.log('got reply from get worker: ' + error + 'payload ' + reply);
         if (error) {
             res.status(404).send(reply);   
         } else {
@@ -220,6 +220,6 @@ request.post({
 },
 function (error, response, body) {
     if (error) console.log('err', error);
-    console.log('res: ', response);
-    console.log('body: ', body);
+    // console.log('res: ', response);
+    // console.log('body: ', body);
 });
