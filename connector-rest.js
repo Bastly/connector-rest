@@ -50,10 +50,10 @@ var router = express.Router();              // get an instance of the express Ro
 
 // chaski worker request
 router.get('/requestChaski', function(req, res) {
-    console.log(req.params);
-    var channel = req.params.channel;
-    var from = req.params.from;
-    var apiKey = req.params.apiKey;
+    console.log(req.query);
+    var channel = req.query.channel;
+    var from = req.query.from;
+    var apiKey = req.query.apiKey;
    
     if(!channel || !from || !apiKey){
         res.status(404).body({ message: "must specify channel, from and apiKey"  });
