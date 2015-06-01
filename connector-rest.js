@@ -109,7 +109,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
                 }
             },
             function (error, response, body) {
-                console.log('body', body);
+                // console.log('body', body);
                 subscriptions[elem.contextElement.id] = {subscriptionId : body.subscribeResponse.subscriptionId, attributes : attrs};
             });
 
