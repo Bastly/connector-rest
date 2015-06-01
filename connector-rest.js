@@ -169,7 +169,7 @@ router.post('/subscription', function (req, res) {
 
 // message publisher 
 router.post('/publishMessage', function(req, res) {
-    var data = req.body.data;    
+    var data = JSON.parse(req.body.data);    
     var from = req.body.from;
     var to = req.body.to;
     var apiKey = req.body.apiKey;
