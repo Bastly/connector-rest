@@ -159,7 +159,7 @@ router.post('/subscription', function (req, res) {
    
     _.each(channels, function (channel) {
         //TODO verify apikey, from is ORION?
-        bastly.sendMessage(channel, "ORION", apiKey,  updatedElement, function(err, reply){
+        bastly.sendMessage(apiKey + ":" + channel, "ORION", apiKey,  updatedElement, function(err, reply){
             console.log('messasge ack!', reply); 
         });
     });
