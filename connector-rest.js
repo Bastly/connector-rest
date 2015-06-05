@@ -179,9 +179,9 @@ router.post('/publishMessage', function(req, res) {
     bastly.sendMessage(to, from, apiKey, data, function(err, reply){
         console.log('messasge ack!' + reply); 
         if (err) {
-            res.status(404).body({ message: err });  
+            res.status(404).send({ message: err });  
         } else {
-            res.status(200).body({ message: reply }); 
+            res.status(200).send({ message: reply }); 
         }
          
     });
