@@ -137,7 +137,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
                     subscriptions[elem.contextElement.id].attributes = attrs;
                 });
             }  else {
-                console.log('arrays do not differ', _.difference(attrs, subscriptions[elem.contextElement.id].attributes));
+                // console.log('arrays do not differ', _.difference(attrs, subscriptions[elem.contextElement.id].attributes));
             }
         }
 
