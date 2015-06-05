@@ -148,7 +148,7 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
 router.post('/subscription', function (req, res) {
     var updatedElement = req.body.contextResponses[0].contextElement;
-    console.log('received update from ORION' + updatedElement);
+    console.log('received update from ORION--------------------------------------------------');
     var channels = [];
     if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
         channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
