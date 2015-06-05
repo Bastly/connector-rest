@@ -148,19 +148,19 @@ router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d2
 
 router.post('/subscription', function (req, res) {
     var updatedElement = req.body.contextResponses[0].contextElement;
+    console.log('received update from ORION' + updatedElement);
     var channels = [];
     if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
         channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
     }
     
-
     var apiKey = updatedElement.id.substring("BastlyKey:".length, updatedElement.id.indexOf(":userId:"));
     console.log('Object data updated: ', updatedElement);
    
     _.each(channels, function (channel) {
         //TODO verify apikey, from is ORION?
-        bastly.sendMessage(apiKey + ":" + channel, "ORION", apiKey,  updatedElement, function(err, reply){
-            console.log('messasge ack!', reply); 
+        bastly.sendMessage(channel, "ORION", apiKey, updatedElement, function(err, reply){
+            console.log('message sent from ORION to client', err, reply); 
         });
     });
 
