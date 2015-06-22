@@ -70,103 +70,6 @@ router.get('/requestChaski', function(req, res) {
     });
 });
 
-
-router.post('/subscribtionObjectStructure', function (req, res){ //551c09c9984d23677ebc3cff
-    // console.log('object structure watcher');
-
-    _.each(req.body.contextResponses, function (elem) {
-
-        // console.log(elem.contextElement);
-        var attrs = [];
-        _.each( elem.contextElement.attributes, function (attribute){
-            attrs.push(attribute.name);
-        });
-
-        if ( subscriptions[elem.contextElement.id]  === undefined || subscriptions[elem.contextElement.id] === null){
-
-            console.log('create subscription');
-            request.post({
-                url: 'http://' + IP_ORION + '/v1/subscribeContext',
-                json: true, 
-                body: {
-                    "entities": [
-                    {
-                        "type": "BastlyMSG",
-                        "isPattern": "false",
-                        "id": elem.contextElement.id
-                    }
-                    ],
-                    "attributes": [],
-                    "reference": "http://" + IP_CALLBACK + "/api/subscription",
-                    "duration": "P1M",
-                    "notifyConditions": [
-                    {
-                        "type": "ONCHANGE",
-                        "condValues": attrs
-                    }
-                    ],
-                    "throttling": "PT1S"
-                }
-            },
-            function (error, response, body) {
-                // console.log('body', body);
-                subscriptions[elem.contextElement.id] = {subscriptionId : body.subscribeResponse.subscriptionId, attributes : attrs};
-            });
-
-        } else { // only update subscription if any attrs has change cause it generates a notification.
-            if (_.difference(attrs, subscriptions[elem.contextElement.id].attributes).length > 0) {
-                console.log('arrays differ');
-                console.log('update subscription ', subscriptions[elem.contextElement.id].subscriptionId);
-
-                request.post({
-                    url: 'http://' + IP_ORION + '/v1/updateContextSubscription',
-                    json: true, 
-                    body: {
-                        "subscriptionId": subscriptions[elem.contextElement.id].subscriptionId,
-                        "notifyConditions": [
-                        {
-                            "type": "ONCHANGE",
-                            "condValues": attrs
-                        }
-                        ]
-                    }
-                },
-                function (error, response, body) {
-                    // console.log(body);
-                    subscriptions[elem.contextElement.id].subscriptionId = body.subscribeResponse.subscriptionId;
-                    subscriptions[elem.contextElement.id].attributes = attrs;
-                });
-            }  else {
-                // console.log('arrays do not differ', _.difference(attrs, subscriptions[elem.contextElement.id].attributes));
-            }
-        }
-
-    });
-
-    res.sendStatus(200);
-});
-
-router.post('/subscription', function (req, res) {
-    var updatedElement = req.body.contextResponses[0].contextElement;
-    console.log('received update from ORION--------------------------------------------------');
-    var channels = [];
-    if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
-        channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;
-    }
-    
-    var apiKey = updatedElement.id.substring("BastlyKey:".length, updatedElement.id.indexOf(":userId:"));
-    console.log('Object data updated: ', updatedElement);
-   
-    _.each(channels, function (channel) {
-        //TODO verify apikey, from is ORION?
-        bastly.sendMessage(channel, "ORION", apiKey, updatedElement, function(err, reply){
-            console.log('message sent from ORION to client', err, reply); 
-        });
-    });
-
-    res.sendStatus(200);
-});
-
 // message publisher 
 router.post('/publishMessage', function(req, res) {
     var data = JSON.parse(req.body.data);    
@@ -186,6 +89,14 @@ router.post('/publishMessage', function(req, res) {
          
     });
 });
+
+router.post('/subscribtionObjectStructure', orion.subscriptionStructureChange});
+
+router.post('/subscription', orion.updatesFromOrion);
+
+router.post('/listenToOrion', orion.registerNewOrion);
+
+router.post('/subscribeToSpeficOrion', orion.registerOrionInstance);
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
@@ -210,7 +121,7 @@ request.post({
         ],
         "attributes": [],
         "reference": "http://" + IP_CALLBACK + "/api/subscribtionObjectStructure",
-        "duration": "P1M",
+        "duration": "P12M",
         "notifyConditions": [
             {
                 "type": "ONTIMEINTERVAL",
