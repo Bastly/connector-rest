@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/test');
 var Schema = mongoose.Schema;
 var request = require('request');
+var _ = require('undesrcore');
 
 var UserSchema = new Schema({
   subscriptionId: {
