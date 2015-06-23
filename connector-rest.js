@@ -90,13 +90,9 @@ router.post('/publishMessage', function(req, res) {
     });
 });
 
-router.post('/subscribtionObjectStructure', orion.subscriptionStructureChange});
+router.post('/subscriptions', orion.updatesFromOrion);
 
-router.post('/subscription', orion.updatesFromOrion);
-
-router.post('/listenToOrion', orion.registerNewOrion);
-
-router.post('/subscribeToSpeficOrion', orion.registerOrionInstance);
+router.post('/registerOrion', orion.registerOrionInstance);
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
@@ -105,35 +101,3 @@ app.use('/api', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-
-
-// Register to all changes in structures in ORION each 30 secs
-request.post({
-    url: 'http://' + IP_ORION + '/v1/subscribeContext',
-    json: true,
-    body: {
-        "entities": [
-            {
-                "type": "BastlyMSG",
-                "isPattern": "true",
-                "id": "BastlyKey:*"
-            }
-        ],
-        "attributes": [],
-        "reference": "http://" + IP_CALLBACK + "/api/subscribtionObjectStructure",
-        "duration": "P12M",
-        "notifyConditions": [
-            {
-                "type": "ONTIMEINTERVAL",
-                "condValues": [
-                    "PT30S"
-                ]
-            }
-        ]
-    }
-},
-function (error, response, body) {
-    if (error) console.log('err', error);
-    // console.log('res: ', response);
-    // console.log('body: ', body);
-});
