@@ -1,6 +1,20 @@
-var userModel = require('../models/user');
 var mongoose = require('mongoose'),
-User = mongoose.model('User');
+  Schema = mongoose.Schema;
+
+var UserSchema = new Schema({
+  subscriptionId: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  apiKey: {
+    type: String,
+    unique: true,
+    required: true
+  }
+});
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = function (opts) {
     var IP_CALLBACK = opts.IP_CALLBACK;
@@ -11,7 +25,7 @@ module.exports = function (opts) {
         var regex = req.body.pattern || "";
 
         console.log(orionIp, userApiKey, regex);
-        
+
         if (! orionIp || ! userApiKey) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
         } else {
