@@ -8,7 +8,7 @@ module.exports = function (opts) {
     module.registerOrionInstance = function (req, res) {
         var orionIp = req.body.ip;
         var userApiKey = req.body.apiKey;
-        var regex = req.body.pattern;
+        var regex = req.body.pattern || "";
 
         if (! orionIp || ! regex || ! userApiKey) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
