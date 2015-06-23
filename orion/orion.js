@@ -10,9 +10,10 @@ module.exports = function (opts) {
         var userApiKey = req.body.apiKey;
         var regex = req.body.pattern || "";
 
+        console.log(orionIp, userApiKey, regex);
+        
         if (! orionIp || ! userApiKey) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
-            console.log(orionIp, userApiKey, regex);
         } else {
             // if its already registered update
             User.findOne({ apiKey: userApiKey }, function(err, user) {
