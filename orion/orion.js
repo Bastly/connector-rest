@@ -30,8 +30,11 @@ module.exports = function (opts) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
         } else {
             // if its already registered update
-            User.findOne({ apiKey: userApiKey }, function(err, user) {
-                if (err) res.send(500, {status: "error", message: "userkey not found"});
+            User.findOne({ apiKey: userApiKey }, function (err, user) {
+                console.log('query finished');
+                if (err){
+                    res.send(500, {status: "error", message: "userkey not found"});
+                } 
                 console.log(user);
                 res.send(200, {status: "ok", message: "found " + user.toString()});
             });
