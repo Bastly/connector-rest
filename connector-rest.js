@@ -5,6 +5,7 @@ var request = require('request');
 var _ = require('underscore');
 var constants = require('bastly_constants');
 var program = require('commander');
+var orion = require('./orion/orion');
 
 program
   .version('0.0.1')

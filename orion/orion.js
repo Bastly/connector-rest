@@ -1,6 +1,6 @@
-
+var userModel = require('../models/user');
 var mongoose = require('mongoose'),
-User = mongoose.model('User', UserSchema);
+User = mongoose.model('User');
 
 module.exports = function (opts) {
     var IP_CALLBACK = opts.IP_CALLBACK;
