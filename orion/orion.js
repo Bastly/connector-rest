@@ -10,7 +10,7 @@ module.exports = function (opts) {
         var userApiKey = req.body.apiKey;
         var regex = req.body.pattern || "";
 
-        if (! orionIp || ! regex || ! userApiKey) {
+        if (! orionIp || ! userApiKey) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
             console.log(orionIp, userApiKey, regex);
         } else {
@@ -18,6 +18,7 @@ module.exports = function (opts) {
             User.findOne({ apiKey: userApiKey }, function(err, user) {
                 if (err) res.send(500, {status: "error", message: "userkey not found"});
                 console.log(user);
+                res.send(200, {status: "ok", message: "found " + user.toString()});
             });
                  // if does not exist create subscription
                 // request.post({
