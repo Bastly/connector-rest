@@ -5,7 +5,7 @@ var request = require('request');
 var _ = require('underscore');
 var constants = require('bastly_constants');
 var program = require('commander');
-var orion = require('./orion/orion');
+
 
 program
   .version('0.0.1')
@@ -34,6 +34,7 @@ var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
 
+var orion = require('./orion/orion')(IP_CALLBACK);
 var bastly = require('bastly')({ from: 'connector', apiKey: 'none', connector: IP_ATAHUALPA, middleware: true });
 
 // this will let us get the data from a POST
