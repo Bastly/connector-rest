@@ -90,6 +90,7 @@ module.exports = function (opts) {
                                 if (error) {
                                     console.log('err', error);
                                 } else {
+                                    console.log(body);
                                     var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
                                     user.save(function (err) { console.log(err) });
                                     console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
