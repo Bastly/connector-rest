@@ -90,9 +90,9 @@ module.exports = function (opts) {
                                 if (error) {
                                     console.log('err', error);
                                 } else {
-                                    var user = new User({ subscriptionId : body.registrationId, apiKey : userApiKey});
-                                    user.save(function (err) {});
-                                    console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.registrationId);
+                                    var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
+                                    user.save(function (err) { console.log(err) });
+                                    console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
                                     res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
                                 }
                             });
