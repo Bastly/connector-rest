@@ -56,7 +56,7 @@ module.exports = function (opts) {
                         }
                     }, function (error, response, body) {
                         if (error) console.log('err', error);
-                        if (body.contextResponses[0].statuCode.code == 200) {
+                        if (body.contextResponses[0].statusCode.code == 200) {
                             var attrs = [];
                             _.each( elem.contextElement.attributes, function (attribute){
                                 attrs.push(attribute.name);
