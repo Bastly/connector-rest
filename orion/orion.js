@@ -78,10 +78,10 @@ module.exports = function (opts) {
                                     "attributes": [],
                                     "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
                                     "duration": "P12M",
-                                    "condValues": [
+                                    "notifyConditions": [
                                     {
                                         "type": "ONCHANGE",
-                                        "attributes" : attrs
+                                        "condValues" : attrs
                                     }
                                     ]
                                 }
