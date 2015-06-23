@@ -32,71 +32,74 @@ module.exports = function (opts) {
         } else {
             // if its already registered update
             User.findOne({ apiKey: userApiKey }, function (err, user) {
-                console.log('query finished');
                 if (err){
                     res.send(500, {status: "error", message: "userkey not found"});
-                } 
-                console.log(user);
-                res.send(200, {status: "ok", message: "found " + user.toString()});
-            });
-                 // if does not exist create subscription
-                // request.post({
-                // url: 'http://' + orionIp + '/v1/queryContext',
-                // json: true,
-                // body: {
-                //         "entities": [
-                //             {
-                //                 "type": [],
-                //                 "isPattern": "true",
-                //                 "id": ".*" + regex
-                //             }
-                //         ]
-                //     }
-                // }, function (error, response, body) {
-                //     if (error) console.log('err', error);
-                //     if (body.contextResponses[0].statuCode.code == 200) {
-                //         var attrs = [];
-                //         _.each( elem.contextElement.attributes, function (attribute){
-                //             attrs.push(attribute.name);
-                //         });
+                }
 
-                //         // Register to all changes in structures in ORION each 30 secs
-                //         request.post({
-                //             url: 'http://' + orionIp + '/v1/subscribeContext',
-                //             json: true,
-                //             body: {
-                //                 "entities": [
-                //                 {
-                //                     "type": [],
-                //                     "isPattern": "true",
-                //                     "id": ".*" + regex
-                //                 }
-                //                 ],
-                //                 "attributes": [],
-                //                 "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
-                //                 "duration": "P12M",
-                //                 "notifyConditions": [
-                //                 {
-                //                     "type": "ONCHANGE",
-                //                     "attributes" : attrs
-                //                 }
-                //                 ]
-                //             }
-                //         },
-                //         function (error, response, body) {
-                //             if (error) {
-                //                 console.log('err', error);
-                //             } else {
-                //                 subscriptionsToApiKey[body.registrationId] = userApiKey;
-                //                 apiKeysToSubscriptionsId[userApiKey] = body.registrationId;
-                //                 console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.registrationId);
-                //                 res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
-                //             }
-                //         });
-                //     } else {
-                //         res.send(500, {status: "error", message: "no entities subscribed to"});
-                //     }
-                // });
+                if (user) { // exists update
+
+                } else {
+                    console.log('ApiKey does not exist, creating subscription for this');
+                     // if does not exist create subscription
+                    request.post({
+                    url: 'http://' + orionIp + '/v1/queryContext',
+                    json: true,
+                    body: {
+                            "entities": [
+                                {
+                                    "type": [],
+                                    "isPattern": "true",
+                                    "id": ".*" + regex
+                                }
+                            ]
+                        }
+                    }, function (error, response, body) {
+                        if (error) console.log('err', error);
+                        if (body.contextResponses[0].statuCode.code == 200) {
+                            var attrs = [];
+                            _.each( elem.contextElement.attributes, function (attribute){
+                                attrs.push(attribute.name);
+                            });
+
+                            // Register to all changes in structures in ORION each 30 secs
+                            request.post({
+                                url: 'http://' + orionIp + '/v1/subscribeContext',
+                                json: true,
+                                body: {
+                                    "entities": [
+                                    {
+                                        "type": [],
+                                        "isPattern": "true",
+                                        "id": ".*" + regex
+                                    }
+                                    ],
+                                    "attributes": [],
+                                    "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
+                                    "duration": "P12M",
+                                    "notifyConditions": [
+                                    {
+                                        "type": "ONCHANGE",
+                                        "attributes" : attrs
+                                    }
+                                    ]
+                                }
+                            },
+                            function (error, response, body) {
+                                if (error) {
+                                    console.log('err', error);
+                                } else {
+                                    var user = new User({ subscriptionId : body.registrationId, apiKey : userApiKey});
+                                    user.save(function (err) {});
+                                    console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.registrationId);
+                                    res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
+                                }
+                            });
+                        } else {
+                            res.send(500, {status: "error", message: "no entities subscribed to" });
+                        }
+                    });
+                }
+            });  
         }
     }
 
