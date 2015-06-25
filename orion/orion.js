@@ -159,6 +159,7 @@ module.exports = function (opts) {
             channels.push("orion");
         }
 
+        console.log('sub id' : req.body.subscriptionId);
         //get APIKEY FROM SUBSCRIPTION ID AND PUT IT TO THE NEXT CALL FOR CHANNELS
         User.findOne({ subscriptionId: req.body.subscriptionId }, function (err, user) {
             if (err) console.log(err);
