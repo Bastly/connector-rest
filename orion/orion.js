@@ -90,7 +90,7 @@ module.exports = function (opts) {
                                     res.send(500, {status: "error", message: error});
                                 }
 
-                                console.log('updating subscription apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
+                                console.log('updating subscription apikey: ' + userApiKey + ' withRegId: ' + user.subscriptionId);
                                 res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
                             });
                         } else {
