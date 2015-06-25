@@ -122,13 +122,13 @@ module.exports = function (opts) {
                                     console.log('err', error);
                                 } else {
                                     console.log(body);
-                                    if (! user) {
-                                        console.log('creating user');
-                                        var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
+                                    if (user) {
+                                       console.log('updating user');
+                                        user.subscriptionId = body.subscribeResponse.subscriptionId;
                                         user.save(function (err) { console.log(err) });
                                     } else {
-                                        console.log('updating user');
-                                        user.subscriptionId = body.subscribeResponse.subscriptionId;
+                                         console.log('creating user');
+                                        var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
                                         user.save(function (err) { console.log(err) });
                                     }
                                     console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
