@@ -62,6 +62,8 @@ module.exports = function (opts) {
                         if (error) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
+                        } else {
+                            console.log('unsubscription '+ body);
                         }
                     });
 
