@@ -151,7 +151,7 @@ module.exports = function (opts) {
     }
 
     module.updatesFromOrion = function (req, res) {
-        console.log('received update from ORION--------------------------------------------------');
+        console.log('received update from ORION--------------------------------------------------', req.body);
         var updatedElement = req.body.contextResponses[0].contextElement;
         var channels = [];
         if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
@@ -161,12 +161,12 @@ module.exports = function (opts) {
         }
         
         //get APIKEY FROM SUBSCRIPTION ID AND PUT IT TO THE NEXT CALL FOR CHANNELS
-        var apiKey = req.body.subscriptionId;
-
-        _.each(channels, function (channel) {
-            //TODO verify apikey, from is ORION?
-            bastly.sendMessage(channel, "ORION", apiKey, updatedElement, function(err, reply){
-                console.log('message sent from ORION to client', err, reply); 
+        User.findOne({ subscriptionId: req.body.subscriptionId }, function (err, user) {
+            _.each(channels, function (channel) {
+                //TODO verify apikey, from is ORION?
+                bastly.sendMessage(channel, "ORION", user.apiKey, updatedElement, function(err, reply){
+                    console.log('message sent from ORION to client', err, reply); 
+                });
             });
         });
 
