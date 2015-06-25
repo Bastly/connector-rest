@@ -5,16 +5,16 @@ var request = require('request');
 var _ = require('underscore');
 
 var UserSchema = new Schema({
-  subscriptionId: {
-    type: String,
-    unique: true,
-    required: true
-  },
-  apiKey: {
-    type: String,
-    unique: true,
-    required: true
-  }
+    subscriptionId: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    apiKey: {
+        type: String,
+        unique: true,
+        required: true
+    }
 });
 
 var User = mongoose.model('User', UserSchema);
@@ -37,119 +37,117 @@ module.exports = function (opts) {
         } else {
             // check if Orion si where its says it is
             request.get({
-                url: 'http://' + orionIp + '/version',
-                json: true,
-            },
-            function (error, response, body) {
-                if (error) {
-                    console.log('err', error);
-                    res.send(500, {status: "error", message: "no orion on given IP"});
-                } else {
-                    // if its already registered update
-            User.findOne({ apiKey: userApiKey }, function (err, user) {
-                if (err){
-                    res.send(500, {status: "error", message: "userkey not found"});
-                }
-                console.log('user: ', user);
-                if (user) { // exists update delete subscription and create a new one
-                    
-                    request.post({
-                    url: 'http://' + orionIp + '/v1/unsubscribeContext',
-                    json: true,
-                    body: {
-                            "subscriptionId": user.subscriptionId
-                        }
-                    }, function (error, response, body) {
-                        if (error) {
-                            console.log('err', error);
-                            res.send(500, {status: "error", message: error});
-                        } else {
-                            console.log('unsubscription ', body);
-                        }
-                    });
+                    url: 'http://' + orionIp + '/version',
+                    json: true
+                },
+                function (error, response, body) {
+                    if (error) {
+                        console.log('err', error);
+                        res.send(500, {status: "error", message: "no orion on given IP"});
+                    } else {
+                        // if its already registered update
+                        User.findOne({ apiKey: userApiKey }, function (err, user) {
+                            if (err){
+                                res.send(500, {status: "error", message: "userkey not found"});
+                            }
+                            console.log('user: ', user);
+                            if (user) { // exists update delete subscription and create a new one
 
-                } 
-                    
-                    console.log('creating a new subscription for this');
-                     // if does not exist create subscription
-                    request.post({
-                    url: 'http://' + orionIp + '/v1/queryContext',
-                    json: true,
-                    body: {
-                            "entities": [
-                                {
-                                    "type": [],
-                                    "isPattern": "true",
-                                    "id": ".*" + regex
-                                }
-                            ]
-                        }
-                    }, function (error, response, body) {
-                        if (error) {
-                            console.log('err', error);
-                            res.send(500, {status: "error", message: error});
-                        } 
-                        if (body.contextResponses && body.contextResponses[0].statusCode.code == 200) {
-                            var attrs = [];
-                            _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
-                                attrs.push(attribute.name);
-                            });
+                                request.post({
+                                    url: 'http://' + orionIp + '/v1/unsubscribeContext',
+                                    json: true,
+                                    body: {
+                                        "subscriptionId": user.subscriptionId
+                                    }
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log('err', error);
+                                        res.send(500, {status: "error", message: error});
+                                    } else {
+                                        console.log('unsubscription ', body);
+                                    }
+                                });
 
-                            // Register to all changes in structures in ORION
+                            }
+
+                            console.log('creating a new subscription for this');
+                            // if does not exist create subscription
                             request.post({
-                                url: 'http://' + orionIp + '/v1/subscribeContext',
+                                url: 'http://' + orionIp + '/v1/queryContext',
                                 json: true,
                                 body: {
                                     "entities": [
-                                    {
-                                        "type": [],
-                                        "isPattern": "true",
-                                        "id": ".*" + regex
-                                    }
-                                    ],
-                                    "attributes": [],
-                                    "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
-                                    "duration": "P12M",
-                                    "notifyConditions": [
-                                    {
-                                        "type": "ONCHANGE",
-                                        "condValues" : attrs
-                                    }
+                                        {
+                                            "type": [],
+                                            "isPattern": "true",
+                                            "id": ".*" + regex
+                                        }
                                     ]
                                 }
-                            },
-                            function (error, response, body) {
+                            }, function (error, response, body) {
                                 if (error) {
                                     console.log('err', error);
+                                    res.send(500, {status: "error", message: error});
+                                }
+                                if (body.contextResponses && body.contextResponses[0].statusCode.code == 200) {
+                                    var attrs = [];
+                                    _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
+                                        attrs.push(attribute.name);
+                                    });
+
+                                    // Register to all changes in structures in ORION
+                                    request.post({
+                                            url: 'http://' + orionIp + '/v1/subscribeContext',
+                                            json: true,
+                                            body: {
+                                                "entities": [
+                                                    {
+                                                        "type": [],
+                                                        "isPattern": "true",
+                                                        "id": ".*" + regex
+                                                    }
+                                                ],
+                                                "attributes": [],
+                                                "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
+                                                "duration": "P12M",
+                                                "notifyConditions": [
+                                                    {
+                                                        "type": "ONCHANGE",
+                                                        "condValues" : attrs
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        function (error, response, body) {
+                                            if (error) {
+                                                console.log('err', error);
+                                            } else {
+                                                console.log(body);
+                                                console.log(user);
+                                                if (user) {
+                                                    console.log('updating user');
+                                                    user.subscriptionId = body.subscribeResponse.subscriptionId;
+                                                    user.save(function (err) { console.log(err) });
+                                                } else {
+                                                    console.log('creating user');
+                                                    var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
+                                                    user.save(function (err) { console.log(err) });
+                                                }
+                                                console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
+                                                res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
+                                            }
+                                        });
                                 } else {
                                     console.log(body);
-                                    console.log(user);
-                                    if (user) {
-                                       console.log('updating user');
-                                        user.subscriptionId = body.subscribeResponse.subscriptionId;
-                                        user.save(function (err) { console.log(err) });
-                                    } else {
-                                         console.log('creating user');
-                                        var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
-                                        user.save(function (err) { console.log(err) });
-                                    }
-                                    console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
-                                    res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
+                                    res.send(500, {status: "error", message: "no entities subscribed to" });
                                 }
                             });
-                        } else {
-                            console.log(body);
-                            res.send(500, {status: "error", message: "no entities subscribed to" });
-                        }
-                    });
-                
-            });  
-                }
-            });
 
-            
+                        });
+                    }
+                });
         }
-    }
+    };
 
     module.updatesFromOrion = function (req, res) {
         console.log('received update from ORION--------------------------------------------------', req.body);
@@ -160,7 +158,7 @@ module.exports = function (opts) {
         } else {
             channels.push("orion");
         }
-        
+
         //get APIKEY FROM SUBSCRIPTION ID AND PUT IT TO THE NEXT CALL FOR CHANNELS
         User.findOne({ subscriptionId: req.body.subscriptionId }, function (err, user) {
             if (err) console.log(err);
@@ -168,14 +166,14 @@ module.exports = function (opts) {
             _.each(channels, function (channel) {
                 //TODO verify apikey, from is ORION?
                 bastly.sendMessage(channel, "ORION", user.apiKey, updatedElement, function(err, reply){
-                    console.log('message sent from ORION to client', err, reply); 
+                    console.log('message sent from ORION to client', err, reply);
                 });
             });
         });
 
         res.sendStatus(200);
-    }
+    };
 
-return module;
+    return module;
 }
 
