@@ -35,7 +35,17 @@ module.exports = function (opts) {
         if (! orionIp || ! userApiKey) {
             res.send(400, {status: "error", message: "missing OrionIp, pattern or apiKey"});
         } else {
-            // if its already registered update
+            // check if Orion si where its says it is
+            request.get({
+                url: 'http://' + orionIp + '/version',
+                json: true,
+            },
+            function (error, response, body) {
+                if (error) {
+                    console.log('err', error);
+                    res.send(500, {status: "error", message: "no orion on given IP"});
+                } else {
+                    // if its already registered update
             User.findOne({ apiKey: userApiKey }, function (err, user) {
                 if (err){
                     res.send(500, {status: "error", message: "userkey not found"});
@@ -166,6 +176,10 @@ module.exports = function (opts) {
                     });
                 }
             });  
+                }
+            });
+
+            
         }
     }
 
