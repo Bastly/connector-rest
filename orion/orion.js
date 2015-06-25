@@ -123,16 +123,17 @@ module.exports = function (opts) {
                                                 console.log('err', error);
                                             } else {
                                                 console.log(body);
-                                                console.log(user);
-                                                if (user) {
-                                                    console.log('updating user');
-                                                    user.subscriptionId = body.subscribeResponse.subscriptionId;
-                                                    user.save(function (err) { console.log(err) });
-                                                } else {
-                                                    console.log('creating user');
-                                                    var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
-                                                    user.save(function (err) { console.log(err) });
-                                                }
+                                                 User.findOne({ apiKey: userApiKey }, function (err, user) {
+                                                    if (user) {
+                                                        console.log('updating user');
+                                                        user.subscriptionId = body.subscribeResponse.subscriptionId;
+                                                        user.save(function (err) { console.log(err) });
+                                                    } else {
+                                                        console.log('creating user');
+                                                        var user = new User({ subscriptionId : body.subscribeResponse.subscriptionId, apiKey : userApiKey});
+                                                        user.save(function (err) { console.log(err) });
+                                                    }
+                                                 });
                                                 console.log('registering apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
                                                 res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
                                             }
