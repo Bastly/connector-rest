@@ -63,7 +63,7 @@ module.exports = function (opts) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
                         } else {
-                            console.log('unsubscription '+ body);
+                            console.log('unsubscription '+ body.toString());
                         }
                     });
 
@@ -88,7 +88,7 @@ module.exports = function (opts) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
                         } 
-                        if (body.contextResponses[0].statusCode.code == 200) {
+                        if (body.contextResponse && body.contextResponses[0].statusCode.code == 200) {
                             var attrs = [];
                             _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
                                 attrs.push(attribute.name);
