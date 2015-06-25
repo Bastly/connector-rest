@@ -37,9 +37,66 @@ module.exports = function (opts) {
                 if (err){
                     res.send(500, {status: "error", message: "userkey not found"});
                 }
-
                 if (user) { // exists update
+                    request.post({
+                    url: 'http://' + orionIp + '/v1/queryContext',
+                    json: true,
+                    body: {
+                            "entities": [
+                                {
+                                    "type": [],
+                                    "isPattern": "true",
+                                    "id": ".*" + regex
+                                }
+                            ]
+                        }
+                    }, function (error, response, body) {
+                        if (error) {
+                            console.log('err', error);
+                            res.send(500, {status: "error", message: error});
+                        }
+                        if (body.contextResponses[0].statusCode.code == 200) {
+                            var attrs = [];
+                            _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
+                                attrs.push(attribute.name);
+                            });
 
+                            request.post({
+                                url: 'http://' + orionIp + '/v1/updateContextSubscription',
+                                json: true,
+                                body: {
+                                    "subscriptionId": user.subscriptionId,
+                                    "entities": [
+                                    {
+                                        "type": [],
+                                        "isPattern": "true",
+                                        "id": ".*" + regex
+                                    }
+                                    ],
+                                    "attributes": [],
+                                    "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
+                                    "duration": "P12M",
+                                    "notifyConditions": [
+                                    {
+                                        "type": "ONCHANGE",
+                                        "condValues" : attrs
+                                    }
+                                    ]
+                                }
+                            },
+                            function (error, response, body) {
+                                if (error) {
+                                    console.log('err', error);
+                                    res.send(500, {status: "error", message: error});
+                                }
+
+                                console.log('updating subscription apikey: ' + userApiKey + ' withRegId: ' + body.subscribeResponse.subscriptionId);
+                                res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
+                            });
+                        } else {
+                            res.send(500, {status: "error", message: "no entities subscribed to" });
+                        }
+                    });
                 } else {
                     console.log('ApiKey does not exist, creating subscription for this');
                      // if does not exist create subscription
@@ -56,7 +113,10 @@ module.exports = function (opts) {
                             ]
                         }
                     }, function (error, response, body) {
-                        if (error) console.log('err', error);
+                        if (error) {
+                            console.log('err', error);
+                            res.send(500, {status: "error", message: error});
+                        } 
                         if (body.contextResponses[0].statusCode.code == 200) {
                             var attrs = [];
                             _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
