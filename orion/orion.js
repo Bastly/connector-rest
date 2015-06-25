@@ -55,7 +55,7 @@ module.exports = function (opts) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
                         }
-                        if (body.contextResponses[0].statusCode.code == 200) {
+                        if (body.contextResponses && body.contextResponses[0].statusCode.code == 200) {
                             var attrs = [];
                             _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
                                 attrs.push(attribute.name);
