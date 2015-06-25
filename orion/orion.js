@@ -122,6 +122,7 @@ module.exports = function (opts) {
                                     console.log('err', error);
                                 } else {
                                     console.log(body);
+                                    console.log(user);
                                     if (user) {
                                        console.log('updating user');
                                         user.subscriptionId = body.subscribeResponse.subscriptionId;
