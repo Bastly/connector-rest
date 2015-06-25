@@ -23,6 +23,8 @@ module.exports = function (opts) {
     var IP_CALLBACK = opts.webHook;
     var bastly = opts.bastlyInstance;
 
+    console.log('setting orion module with webhook on ' + webHook);
+
     module.registerOrionInstance = function (req, res) {
         var orionIp = req.body.ip;
         var userApiKey = req.body.apiKey;
