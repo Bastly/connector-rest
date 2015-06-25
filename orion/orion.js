@@ -50,6 +50,7 @@ module.exports = function (opts) {
                 if (err){
                     res.send(500, {status: "error", message: "userkey not found"});
                 }
+                console.log('user: ', user);
                 if (user) { // exists update delete subscription and create a new one
                     
                     request.post({
@@ -162,6 +163,8 @@ module.exports = function (opts) {
         
         //get APIKEY FROM SUBSCRIPTION ID AND PUT IT TO THE NEXT CALL FOR CHANNELS
         User.findOne({ subscriptionId: req.body.subscriptionId }, function (err, user) {
+            if (err) console.log(err);
+            console.log(user);
             _.each(channels, function (channel) {
                 //TODO verify apikey, from is ORION?
                 bastly.sendMessage(channel, "ORION", user.apiKey, updatedElement, function(err, reply){
