@@ -20,7 +20,8 @@ var UserSchema = new Schema({
 var User = mongoose.model('User', UserSchema);
 
 module.exports = function (opts) {
-    var IP_CALLBACK = opts.IP_CALLBACK;
+    var IP_CALLBACK = opts.webHook;
+    var bastly = opts.bastlyInstance;
 
     module.registerOrionInstance = function (req, res) {
         var orionIp = req.body.ip;
@@ -123,7 +124,7 @@ module.exports = function (opts) {
                                 attrs.push(attribute.name);
                             });
 
-                            // Register to all changes in structures in ORION each 30 secs
+                            // Register to all changes in structures in ORION
                             request.post({
                                 url: 'http://' + orionIp + '/v1/subscribeContext',
                                 json: true,
@@ -167,8 +168,8 @@ module.exports = function (opts) {
     }
 
     module.updatesFromOrion = function (req, res) {
-        var updatedElement = req.body.contextResponses[0].contextElement;
         console.log('received update from ORION--------------------------------------------------');
+        var updatedElement = req.body.contextResponses[0].contextElement;
         var channels = [];
         if (_.findLastIndex(updatedElement.attributes, { name: 'channels' }) != -1) {
             channels = updatedElement.attributes[_.findLastIndex(updatedElement.attributes, { name: 'channels' })].value;

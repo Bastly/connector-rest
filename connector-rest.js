@@ -34,8 +34,9 @@ var IP_ORION = program.orion;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
 
-var orion = require('./orion/orion')(IP_CALLBACK);
+
 var bastly = require('bastly')({ from: 'connector', apiKey: 'none', connector: IP_ATAHUALPA, middleware: true });
+var orion = require('./orion/orion')({ webHook: IP_CALLBACK, bastlyInstance : bastly});
 
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
