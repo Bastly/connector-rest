@@ -50,68 +50,24 @@ module.exports = function (opts) {
                 if (err){
                     res.send(500, {status: "error", message: "userkey not found"});
                 }
-                if (user) { // exists update
+                if (user) { // exists update delete subscription and create a new one
+                    
                     request.post({
-                    url: 'http://' + orionIp + '/v1/queryContext',
+                    url: 'http://' + orionIp + '/v1/unsubscribeContext',
                     json: true,
                     body: {
-                            "entities": [
-                                {
-                                    "type": [],
-                                    "isPattern": "true",
-                                    "id": ".*" + regex
-                                }
-                            ]
+                            "subscriptionId": user.subscriptionId
                         }
                     }, function (error, response, body) {
                         if (error) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
                         }
-                        if (body.contextResponses && body.contextResponses[0].statusCode.code == 200) {
-                            var attrs = [];
-                            _.each( body.contextResponses[0].contextElement.attributes, function (attribute){
-                                attrs.push(attribute.name);
-                            });
-
-                            request.post({
-                                url: 'http://' + orionIp + '/v1/updateContextSubscription',
-                                json: true,
-                                body: {
-                                    "subscriptionId": user.subscriptionId,
-                                    "entities": [
-                                    {
-                                        "type": [],
-                                        "isPattern": "true",
-                                        "id": ".*" + regex
-                                    }
-                                    ],
-                                    "attributes": [],
-                                    "reference": "http://" + IP_CALLBACK + "/api/subscriptions",
-                                    "duration": "P12M",
-                                    "notifyConditions": [
-                                    {
-                                        "type": "ONCHANGE",
-                                        "condValues" : attrs
-                                    }
-                                    ]
-                                }
-                            },
-                            function (error, response, body) {
-                                if (error) {
-                                    console.log('err', error);
-                                    res.send(500, {status: "error", message: error});
-                                }
-
-                                console.log('updating subscription apikey: ' + userApiKey + ' withRegId: ' + user.subscriptionId);
-                                res.send(200, {status: "ok", message: "registered to attributes: " + attrs.toString() });
-                            });
-                        } else {
-                            res.send(500, {status: "error", message: "no entities subscribed to" });
-                        }
                     });
-                } else {
-                    console.log('ApiKey does not exist, creating subscription for this');
+
+                } 
+                    
+                    console.log('creating a new subscription for this');
                      // if does not exist create subscription
                     request.post({
                     url: 'http://' + orionIp + '/v1/queryContext',
@@ -174,7 +130,7 @@ module.exports = function (opts) {
                             res.send(500, {status: "error", message: "no entities subscribed to" });
                         }
                     });
-                }
+                
             });  
                 }
             });
