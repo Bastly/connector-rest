@@ -63,7 +63,7 @@ module.exports = function (opts) {
                             console.log('err', error);
                             res.send(500, {status: "error", message: error});
                         } else {
-                            console.log('unsubscription '+ body.toString());
+                            console.log('unsubscription ', body);
                         }
                     });
 
@@ -134,6 +134,7 @@ module.exports = function (opts) {
                                 }
                             });
                         } else {
+                            console.log(body);
                             res.send(500, {status: "error", message: "no entities subscribed to" });
                         }
                     });
