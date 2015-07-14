@@ -11,7 +11,7 @@ program
   .version('0.0.1')
   .usage('connector-rest --atahualpa <IP> --orion <IP:port> --callback <IP:port>')
   .option('-a, --atahualpa <IP>', 'specify atahualpa IP to connect to', '127.0.0.1')
-  .option('-o, --orion <IP:port>', 'specify orion IP and PORT to connect to', '127.0.0.1:1026')
+  .option('-d, --db <IP>', 'specify db IP to connect to', '127.0.0.1:1026')
   .option('-c, --callback <IP:port>', 'specify the callback ip of this endpoint', '127.0.0.1:8080')
   .parse(process.argv);
 
@@ -30,13 +30,13 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
-var IP_ORION = program.orion;
+var IP_DB = program.db;
 var IP_ATAHUALPA = program.atahualpa;
 var IP_CALLBACK = program.callback;
 
 
 var bastly = require('bastly')({ from: 'connector', apiKey: 'none', connector: IP_ATAHUALPA, middleware: true });
-var orion = require('./orion/orion')({ webHook: IP_CALLBACK, bastlyInstance : bastly});
+var orion = require('./orion/orion')({ webHook: IP_CALLBACK, bastlyInstance : bastly, ddbb: IP_DB});
 
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));

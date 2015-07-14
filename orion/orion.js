@@ -1,27 +1,29 @@
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
-var Schema = mongoose.Schema;
 var request = require('request');
 var _ = require('underscore');
-
-var UserSchema = new Schema({
-    subscriptionId: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    apiKey: {
-        type: String,
-        unique: true,
-        required: true
-    }
-});
-
-var User = mongoose.model('User', UserSchema);
 
 module.exports = function (opts) {
     var IP_CALLBACK = opts.webHook;
     var bastly = opts.bastlyInstance;
+    var IP_DB = opts.ddbb;
+
+    var mongoose = require('mongoose');
+    mongoose.connect('mongodb://' + IP_DB + '/test');
+    var Schema = mongoose.Schema;
+
+    var UserSchema = new Schema({
+        subscriptionId: {
+            type: String,
+            unique: true,
+            required: true
+        },
+        apiKey: {
+            type: String,
+            unique: true,
+            required: true
+        }
+    });
+
+    var User = mongoose.model('User', UserSchema);
 
     console.log('setting orion module with webhook on ' + IP_CALLBACK);
 
